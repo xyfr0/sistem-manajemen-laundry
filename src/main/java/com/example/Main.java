@@ -37,24 +37,24 @@ public class Main {
         int numFra = in.nextInt();
         String fragName = fragrances.get(numFra-1).getFragrance_name();
 
-        System.out.println("Pilih item tambahan:");
-        List<Item> items = getItems();
-        while (true) {
-            for (int i = 0; i < items.size(); i++) {
-                System.out.printf("%d. %s - Rp%.2f\n", i + 1, items.get(i).getItem_name(),
-                        items.get(i).getUnit_price());
-            }
-            System.out.println("0. Lewati");
-            int num2 = in.nextInt();
-            if (num2 == 0) {
-                break;
-            } else{
-                itemsList.add(items.get(num2-1));
-            }
+        // System.out.println("Pilih item tambahan:");
+        // List<Item> items = getItems();
+        // while (true) {
+        //     for (int i = 0; i < items.size(); i++) {
+        //         System.out.printf("%d. %s - Rp%.2f\n", i + 1, items.get(i).getItem_name(),
+        //                 items.get(i).getUnit_price());
+        //     }
+        //     System.out.println("0. Lewati");
+        //     int num2 = in.nextInt();
+        //     if (num2 == 0) {
+        //         break;
+        //     } else{
+        //         itemsList.add(items.get(num2-1));
+        //     }
 
-        }                
+        // }                
         Order order = new Order(generateOrderId(count), customerName, selectedServiceType.getPrice_per_kg(), "Vanilla", weightKg, itemsList);
-        employee.createOrder(order, orders);
+        printInvoice(order, selectedServiceType);
 
     }
 
@@ -107,5 +107,24 @@ public class Main {
         count++;
         return id != null ? id : null;        
     }   
+
+    static void printInvoice(Order order, ServiceType st){
+        System.out.println("=============================================");
+        System.out.println("Catat Data Laundry");
+        System.out.println("=============================================");
+        System.out.println();
+        System.out.printf("Nama Pelanggan:\n %s\n\n", order.getCustomer_name());
+        System.out.printf("Berat Laundry:\n %.1f\n\n", order.getTotal_weight());
+        System.out.printf("Tipe Layanan:\n %s\n\n", st.getService_name());
+        System.out.printf("Jenis Pewangi:\n %s\n\n", order.getFragrance_name());
+        System.out.println("Item Tambahan:");
+        if (order.getAdditionalItems() == null) {
+            System.out.println("Tidak Ada Item Tambahan");
+        } else{
+            for(int i = 0; i < order.getAdditionalItems().size(); i++){
+                System.out.printf("%s - %d", order.getAdditionalItems().get(i).getItem_name(), order.getAdditionalItems().get(i).getQuantity());
+            }
+        }
+    }
 
 }
