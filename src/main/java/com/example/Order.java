@@ -17,15 +17,15 @@ public class Order {
     private String payment_status;
     private List<Item> additionalItems = new ArrayList<>();
 
-    public Order(String order_id, String customer_name, double service_price,
-            String fragrance_name, float total_weight, List<Item> additionalItems) {
+    public Order(String order_id, String customer_name, float total_weight, double service_price,
+            String fragrance_name, List<Item> additionalItems) {
         double itemCosts = 0;
         this.order_id = order_id;
         this.order_date = LocalDateTime.now();
         this.customer_name = customer_name;
+        this.total_weight = total_weight;
         this.due_date = LocalDateTime.now();
         this.fragrance_name = fragrance_name;
-        this.total_weight = total_weight;
         this.additionalItems = additionalItems;
         if (additionalItems != null) {
             for (int i = 0; i < additionalItems.size(); i++) {
@@ -34,6 +34,8 @@ public class Order {
         }
         this.laundry_costs = total_weight * service_price + itemCosts;
     }
+
+    public Order() {}
 
     public String getOrder_id() {
         return order_id;
@@ -131,6 +133,20 @@ public class Order {
         this.additionalItems = additionalItems;
     }
 
+    public String generateOrderId(int count) {
+        String id = null;
+        String date = Integer.toString(LocalDateTime.now().getDayOfMonth());
+        String month = Integer.toString(LocalDateTime.now().getMonthValue());
+        String year = Integer.toString(LocalDateTime.now().getYear()).substring(2);
     
-
+        if (count < 10) {
+            id = String.format("O%s%s%s00%s", year, month, date, Integer.toString(count));
+        } else if (count >= 10 && count < 100) {
+            id = String.format("O%s%s%s0%s", year, month, date, Integer.toString(count));
+        } else if (count >= 100 && count < 1000) {
+            id = String.format("O%s%s%s%s", year, month, date, Integer.toString(count));
+        }
+        count++;
+        return id != null ? id : null;
+    }
 }

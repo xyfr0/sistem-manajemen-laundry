@@ -1,129 +1,105 @@
 package com.example;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
-public class Main {    
-
-    public static void main(String[] args) {        
-        List<Order> orders = new ArrayList<>();
-        List<ServiceType> serviceTypes = getServiceTypes(); 
-        List<Item> itemsList = new ArrayList<>();
-        List<Fragrance> fragrances = getFragrances();
-        int count = 0;
-        
-        Scanner in = new Scanner(System.in);
+public class Main {
+    
+    static void printInvoiceSementara(Order order, ServiceType st, int roundedWeight) {
+        System.out.println("\n========================================================");
         System.out.println("Catat Data Laundry");
+        System.out.println("========================================================");
         System.out.println();
+        System.out.printf("Nama Pelanggan:\n%s\n\n", order.getCustomer_name());
+        System.out.printf("Berat Laundry:\n%.1f\n\n", order.getTotal_weight());
+        System.out.println("Berat dibulatkan ke atas: " + roundedWeight + " kg");
+        System.out.printf("\nTipe Layanan:\n%s - Rp %.0f/kg\n\n", st.getService_name(), st.getPrice_per_kg());
+        System.out.printf("Jenis Pewangi:\n%s\n\n", order.getFragrance_name());
+        System.out.println("Item Tambahan:");
+        System.out.println("Tidak ada item tambahan");
+        System.out.println("\n========================================================\n");
+        // Hitung total estimasi
+        double totalEstimation = roundedWeight * st.getPrice_per_kg();
+        System.out.printf("Total Estimasi:\t\t\t\t   Rp %.0f\n", totalEstimation);
+    }
+    public static void main(String[] args) {
+        Order order = new Order();
+        Customer customer = new Customer();
+        List<Customer> customers = customer.getCustomers();
+        ServiceType serviceType = new ServiceType();
+        List<ServiceType> serviceTypes = serviceType.getServiceTypes();
+        List<Item> itemsList = new ArrayList<>();
+        Fragrance fragrance = new Fragrance();
+        List<Fragrance> fragrances = fragrance.getFragrances();
+        int count = 0;
+
+        Scanner in = new Scanner(System.in);
+        System.out.println("========================================================");
+        System.out.println("Catat Data Laundry");
+        System.out.println("========================================================");
+        System.out.println();
+
         System.out.println("Nama Pelanggan:");
-        String customerName = in.next();
-        System.out.println("Berat (kg):");
+        String customerName = in.nextLine();
+        // Validate customer name input
+        while (customerName.trim().isEmpty()) {
+            System.out.println("Nama tidak boleh kosong");
+            System.out.println("Nama Pelanggan:");
+            customerName = in.nextLine();
+        }
+        // Validasi apakah nama pelanggan ada dalam data pelanggan
+        final String trimmedCustomerName = customerName.trim();
+        boolean customerExists = customers.stream()
+            .anyMatch(c -> c.getCustomer_name().trim().equalsIgnoreCase(trimmedCustomerName));
+
+        if (!customerExists) {
+            System.out.println("Nama pelanggan tidak ditemukan dalam data. Silakan coba lagi.");
+            in.close();
+            return;
+        }
+
+        System.out.println("\nBerat (kg):");
         float weightKg = in.nextFloat();
-        System.out.println("Tipe Layanan (pilih dengan angka):");
+        // Validasi input berat laundry
+        while (weightKg < 0.1f) {
+            System.out.println("Berat tidak boleh kosong, minimal 0.1");
+            System.out.println("Berat (kg):");
+            weightKg = in.nextFloat();
+        }
+
+        // Pembulatan ke atas berat laundry
+        int roundedWeight = (int) Math.ceil(weightKg);
+        System.out.println("Berat dibulatkan ke atas: " + roundedWeight + " kg");
+
+        System.out.println("\nTipe Layanan:");
         for (int i = 0; i < serviceTypes.size(); i++) {
-            System.out.printf("%d. %s - Rp%.2f\n", i + 1, serviceTypes.get(i).getService_name(),
+            System.out.printf("%d. %s - Rp%.0f\n", i + 1, serviceTypes.get(i).getService_name(),
                     serviceTypes.get(i).getPrice_per_kg());
         }
+        System.out.print("\nPilih tipe layanan sesuai dengan opsi yang tersedia: ");
         int num = in.nextInt();
+        if (num < 1 || num > serviceTypes.size()) {
+            System.out.println("Input tidak valid. Menggunakan opsi default: " + serviceTypes.get(0).getService_name());
+            num = 1; // Default : opsi 1
+        }
         ServiceType selectedServiceType = serviceTypes.get(num - 1);
 
-        System.out.println("Pilih pewangi:");
         
+        System.out.println("\njenis Pewangi:");
         for (int i = 0; i < fragrances.size(); i++) {
             System.out.printf("%d. %s\n", i + 1, fragrances.get(i).getFragrance_name());
         }
-
+        System.out.print("\nPilih jenis pewangi sesuai dengan opsi yang tersedia: ");
         int numFra = in.nextInt();
-        String fragName = fragrances.get(numFra-1).getFragrance_name();
-
-        // System.out.println("Pilih item tambahan:");
-        // List<Item> items = getItems();
-        // while (true) {
-        //     for (int i = 0; i < items.size(); i++) {
-        //         System.out.printf("%d. %s - Rp%.2f\n", i + 1, items.get(i).getItem_name(),
-        //                 items.get(i).getUnit_price());
-        //     }
-        //     System.out.println("0. Lewati");
-        //     int num2 = in.nextInt();
-        //     if (num2 == 0) {
-        //         break;
-        //     } else{
-        //         itemsList.add(items.get(num2-1));
-        //     }
-
-        // }                
-        Order order = new Order(generateOrderId(count), customerName, selectedServiceType.getPrice_per_kg(), "Vanilla", weightKg, itemsList);
-        printInvoice(order, selectedServiceType);
-
-    }
-
-    static List<ServiceType> getServiceTypes() {
-        List<ServiceType> serviceTypes = new ArrayList<>();
-        serviceTypes.add(new ServiceType("S001", "Cuci & Setrika (Reguler)", 3, 6000));
-        serviceTypes.add(new ServiceType("S002", "Cuci & Setrika (Express)", 3, 12000));
-        serviceTypes.add(new ServiceType("S003", "Setrika (Reguler)", 3, 4000));
-        serviceTypes.add(new ServiceType("S004", "Setrika (Express)", 3, 8000));
-        serviceTypes.add(new ServiceType("S005", "Cuci & Lipat (Reguler)", 3, 4000));
-        serviceTypes.add(new ServiceType("S006", "Cuci & Lipat (Express)", 3, 8000));
-        return serviceTypes;
-    }
-
-    static List<Item> getItems() {
-        List<Item> items = new ArrayList<>();
-        items.add(new Item("I001", "Gorden", "", 0, 10000, 0));
-        items.add(new Item("I002", "Bed Cover Tebal", "", 0, 35000, 0));
-        items.add(new Item("I003", "Bed Cover Sedang", "", 0, 25000, 0));
-        items.add(new Item("I004", "Bed Cover Kecil", "", 0, 20000, 0));
-        items.add(new Item("I005", "Selimut Tebal", "", 0, 40000, 0));
-        items.add(new Item("I006", "Selimut Sedang", "", 0, 35000, 0));
-        items.add(new Item("I007", "Selimut Kecil", "", 0, 30000, 0));
-        return items;
-    }
-    
-    static List<Fragrance> getFragrances(){
-        List<Fragrance> fragrances = new ArrayList<>();
-        fragrances.add(new Fragrance("F001", "Lavender"));
-        fragrances.add(new Fragrance("F002", "Rose"));
-        fragrances.add(new Fragrance("F003", "Ocean Fresh"));
-        fragrances.add(new Fragrance("F004", "Vanilla"));
-        fragrances.add(new Fragrance("F005", "Tanpa Pewangi"));
-        return fragrances;
-    }
-
-    static String generateOrderId(int count){
-        String id = null;
-        String date = Integer.toString(LocalDateTime.now().getDayOfMonth());        
-        String month = Integer.toString(LocalDateTime.now().getMonthValue());
-        String year = Integer.toString(LocalDateTime.now().getYear()).substring(2);
-
-        if (count < 10) {
-            id = String.format("O%s%s%s00%s", year, month, date, Integer.toString(count));            
-        } else if(count >= 10 && count < 100){
-            id = String.format("O%s%s%s0%s", year, month, date, Integer.toString(count));
-        } else if(count >= 100 && count < 1000){
-            id = String.format("O%s%s%s%s", year, month, date, Integer.toString(count));
+        if (numFra < 1 || numFra > fragrances.size()) {
+            System.out.println("Input tidak valid. Menggunakan opsi default: " + fragrances.get(0).getFragrance_name());
+            numFra = 1; // Default : opsi 1
         }
-        count++;
-        return id != null ? id : null;        
-    }   
+        String fragName = fragrances.get(numFra - 1).getFragrance_name();
 
-    static void printInvoice(Order order, ServiceType st){
-        System.out.println("=============================================");
-        System.out.println("Catat Data Laundry");
-        System.out.println("=============================================");
-        System.out.println();
-        System.out.printf("Nama Pelanggan:\n %s\n\n", order.getCustomer_name());
-        System.out.printf("Berat Laundry:\n %.1f\n\n", order.getTotal_weight());
-        System.out.printf("Tipe Layanan:\n %s\n\n", st.getService_name());
-        System.out.printf("Jenis Pewangi:\n %s\n\n", order.getFragrance_name());
-        System.out.println("Item Tambahan:");
-        if (order.getAdditionalItems() == null) {
-            System.out.println("Tidak Ada Item Tambahan");
-        } else{
-            for(int i = 0; i < order.getAdditionalItems().size(); i++){
-                System.out.printf("%s - %d", order.getAdditionalItems().get(i).getItem_name(), order.getAdditionalItems().get(i).getQuantity());
-            }
-        }
+        // Output
+        Order orderr = new Order(order.generateOrderId(count), customerName, weightKg, selectedServiceType.getPrice_per_kg(), fragName, itemsList);
+        printInvoiceSementara(orderr, selectedServiceType, roundedWeight);
+
+        in.close();
     }
-
 }
