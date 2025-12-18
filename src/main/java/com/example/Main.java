@@ -27,7 +27,6 @@ public class Main {
         List<Customer> customers = customer.getCustomers();
         ServiceType serviceType = new ServiceType();
         List<ServiceType> serviceTypes = serviceType.getServiceTypes();
-        List<Item> itemsList = new ArrayList<>();
         Fragrance fragrance = new Fragrance();
         List<Fragrance> fragrances = fragrance.getFragrances();
         int count = 0;
