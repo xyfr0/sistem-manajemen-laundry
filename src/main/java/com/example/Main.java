@@ -42,7 +42,7 @@ public class Main {
         String customerName = in.nextLine();
         // Validate customer name input
         while (customerName.trim().isEmpty()) {
-            System.out.println("Nama tidak boleh kosong");
+            System.out.println("Nama tidak boleh kosong\n");
             System.out.println("Nama Pelanggan:");
             customerName = in.nextLine();
         }
@@ -52,18 +52,28 @@ public class Main {
             .anyMatch(c -> c.getCustomer_name().trim().equalsIgnoreCase(trimmedCustomerName));
 
         if (!customerExists) {
-            System.out.println("Nama pelanggan tidak ditemukan dalam data. Silakan coba lagi.");
+            System.out.println("Nama pelanggan tidak ditemukan dalam data. Silakan buat akun pelanggan terlebih dahulu.");
             in.close();
             return;
         }
 
-        System.out.println("\nBerat (kg):");
-        float weightKg = in.nextFloat();
-        // Validasi input berat laundry
+        float weightKg = -1;
         while (weightKg < 0.1f) {
-            System.out.println("Berat tidak boleh kosong, minimal 0.1");
-            System.out.println("Berat (kg):");
-            weightKg = in.nextFloat();
+            System.out.println("\nBerat (kg):");
+            String input = in.nextLine().trim();
+            // Validasi input berat
+            if (input.isEmpty()) {
+                System.out.println("Berat tidak boleh kosong, minimal 0.1");
+            } else {
+                try {
+                    weightKg = Float.parseFloat(input);
+                    if (weightKg < 0.1f) {
+                        System.out.println("Berat tidak boleh kosong, minimal 0.1");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Input tidak valid. Masukkan angka.");
+                }
+            }
         }
 
         // Pembulatan ke atas berat laundry
