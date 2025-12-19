@@ -10,7 +10,7 @@ public class Main {
         System.out.println("========================================================");
         System.out.println();
         System.out.printf("Nama Pelanggan:\n%s\n\n", order.getCustomer_name());
-        System.out.printf("Berat Laundry:\n%.1f\n\n", order.getTotal_weight());
+        System.out.printf("Berat Laundry:\n%.1f\n", order.getTotal_weight());
         System.out.println("Berat dibulatkan ke atas: " + roundedWeight + " kg");
         System.out.printf("\nTipe Layanan:\n%s - Rp %.0f/kg\n\n", st.getService_name(), st.getPrice_per_kg());
         System.out.printf("Jenis Pewangi:\n%s\n\n", order.getFragrance_name());
