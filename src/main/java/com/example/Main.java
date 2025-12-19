@@ -29,8 +29,8 @@ public class Main {
         List<ServiceType> serviceTypes = serviceType.getServiceTypes();
         Fragrance fragrance = new Fragrance();
         List<Fragrance> fragrances = fragrance.getFragrances();
-        Item items = new Item();
-        List<Item> itemsList = items.getItems();
+        Item item = new Item();
+        List<Item> items = item.getItems();
         int count = 0;
 
         Scanner in = new Scanner(System.in);
@@ -106,9 +106,11 @@ public class Main {
             numFra = 1; // Default : opsi 1
         }
         String fragName = fragrances.get(numFra - 1).getFragrance_name();
+        
+
 
         // Output
-        Order orderr = new Order(order.generateOrderId(count), customerName, weightKg, selectedServiceType.getPrice_per_kg(), fragName, itemsList);
+        Order orderr = new Order(order.generateOrderId(count), customerName, weightKg, selectedServiceType.getPrice_per_kg(), fragName, items);
         printInvoiceSementara(orderr, selectedServiceType, roundedWeight);
 
         in.close();

@@ -50,7 +50,7 @@ public class Customer {
         this.date_regist = date_regist;
     }
 
-    // TODO: add method to get list of customers from database
+    // TODO: Tambahkan metode untuk mendapatkan daftar pelanggan dari database
     public List<Customer> getCustomers() {
         List<Customer> customers = new ArrayList<>();
         customers.add(new Customer("C001", "Alice", "081234567890", "2024-01-15"));
